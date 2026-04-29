@@ -12,6 +12,8 @@ use std::time::Instant;
 const CHUNK_SIZE: usize = 4096; // Samples per FFT window — must be power of 2
 const OVERLAP: f64 = 0.5;       // 50% overlap between consecutive windows
 const NUM_WORKERS: usize = 8;   // Number of parallel FFT threads
+const NUM_MEL_BINS: usize = 512;
+const IMG_SCALE: u32 = 2;       // Pixel multiplier applied to both axes
 
 // ============================================================
 // STEP 1: READ WAV FILE
@@ -143,6 +145,69 @@ fn apply_hamming_window(chunks: &mut [Vec<f32>]) {
 }
 
 // ============================================================
+// STEP 4.5: MEL FILTERBANK
+// ============================================================
+
+fn hz_to_mel(hz: f32) -> f32 {
+    2595.0 * (1.0 + hz / 700.0).log10()
+}
+
+fn mel_to_hz(mel: f32) -> f32 {
+    700.0 * (10.0_f32.powf(mel / 2595.0) - 1.0)
+}
+
+/// Maps each FFT frame onto NUM_MEL_BINS perceptual mel bands using
+/// triangular filters. Each filter spans three consecutive mel-spaced
+/// frequency points, weighting FFT bins by their distance from the center.
+fn apply_mel_filterbank(spectrogram: &[Vec<f32>], sample_rate: u32) -> Vec<Vec<f32>> {
+    let fft_bins = spectrogram[0].len();
+    let nyquist = sample_rate as f32 / 2.0;
+    let mel_max = hz_to_mel(nyquist);
+
+    let bin_points: Vec<usize> = (0..=(NUM_MEL_BINS + 1))
+        .map(|i| {
+            let mel = mel_max * i as f32 / (NUM_MEL_BINS + 1) as f32;
+            let hz = mel_to_hz(mel);
+            let bin = ((hz / nyquist) * (fft_bins - 1) as f32).round() as usize;
+            bin.min(fft_bins - 1)
+        })
+        .collect();
+
+    spectrogram
+        .iter()
+        .map(|frame| {
+            (0..NUM_MEL_BINS)
+                .map(|m| {
+                    let left   = bin_points[m];
+                    let center = bin_points[m + 1];
+                    let right  = bin_points[m + 2];
+
+                    let mut energy = 0.0f32;
+                    let mut weight_sum = 0.0f32;
+
+                    if center > left {
+                        for k in left..=center {
+                            let w = (k - left) as f32 / (center - left) as f32;
+                            energy += frame[k] * w;
+                            weight_sum += w;
+                        }
+                    }
+                    if right > center {
+                        for k in (center + 1)..=right {
+                            let w = (right - k) as f32 / (right - center) as f32;
+                            energy += frame[k] * w;
+                            weight_sum += w;
+                        }
+                    }
+
+                    if weight_sum == 0.0 { frame[center] } else { energy / weight_sum }
+                })
+                .collect()
+        })
+        .collect()
+}
+
+// ============================================================
 // STEP 5 & 6: PARALLEL FFT + MAGNITUDE COMPUTATION
 // ============================================================
 
@@ -233,25 +298,24 @@ fn render_spectrogram(
     let freq_bins = spectrogram[0].len();
 
     // --- Convert to decibels and find the range ---
-    // dB = 20 * log10(magnitude)
-    let db_floor = -120.0_f32; // Silence floor
+    let initial_floor = -120.0_f32;
+    let dynamic_range = 80.0_f32;
 
     let mut db_data: Vec<Vec<f32>> = Vec::with_capacity(time_bins);
-    let mut global_max: f32 = db_floor;
+    let mut global_max: f32 = initial_floor;
 
     for col in spectrogram {
         let db_col: Vec<f32> = col
             .iter()
             .map(|&mag| {
                 if mag <= 0.0 {
-                    db_floor
+                    initial_floor
                 } else {
                     20.0 * mag.log10()
                 }
             })
             .collect();
 
-        // Track the loudest value for normalization.
         for &val in &db_col {
             if val > global_max {
                 global_max = val;
@@ -260,20 +324,24 @@ fn render_spectrogram(
         db_data.push(db_col);
     }
 
+    // Anchor floor to the loudest bin so dynamic range stays consistent
+    // regardless of absolute signal level.
+    let db_floor = global_max - dynamic_range;
+
     // --- Build the image ---
     // Width = time bins, Height = frequency bins.
     // We flip the Y axis so low frequencies are at the bottom.
-    let img_width = time_bins as u32;
-    let img_height = freq_bins as u32;
+    let img_width = time_bins as u32 * IMG_SCALE;
+    let img_height = freq_bins as u32 * IMG_SCALE;
 
     let img = ImageBuffer::from_fn(img_width, img_height, |x, y| {
         // Flip Y: row 0 in the image = highest frequency bin.
-        let freq_idx = (freq_bins - 1) - y as usize;
-        let time_idx = x as usize;
+        let freq_idx = (freq_bins - 1) - (y / IMG_SCALE) as usize;
+        let time_idx = (x / IMG_SCALE) as usize;
 
         // Normalize dB value to [0.0, 1.0] range.
         let db_val = db_data[time_idx][freq_idx];
-        let normalized = ((db_val - db_floor) / (global_max - db_floor)).clamp(0.0, 1.0);
+        let normalized = ((db_val - db_floor) / dynamic_range).clamp(0.0, 1.0);
 
         // Map to a heat colormap:
         //   0.00 - 0.25 → black to blue
@@ -385,9 +453,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         spectrogram[0].len()
     );
 
+    // Step 5.5: Apply mel filterbank
+    println!("Step 5.5: Applying mel filterbank ({} mel bins)...", NUM_MEL_BINS);
+    let mel_spectrogram = apply_mel_filterbank(&spectrogram, sample_rate);
+    println!(
+        "  Mel spectrogram: {} time bins x {} mel bins",
+        mel_spectrogram.len(),
+        mel_spectrogram[0].len()
+    );
+
     // Step 7 & 8: Render and save
     println!("Step 6: Rendering spectrogram to {}...", output_file);
-    render_spectrogram(&spectrogram, &output_file, sample_rate)?;
+    render_spectrogram(&mel_spectrogram, &output_file, sample_rate)?;
 
     println!("Done!");
 
