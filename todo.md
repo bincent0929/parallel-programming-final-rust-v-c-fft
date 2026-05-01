@@ -1,0 +1,2 @@
+- [ ] Set up the program to take input for how many workers to use.
+- [ ] Create a report that outline the speed up and describes how the program works
