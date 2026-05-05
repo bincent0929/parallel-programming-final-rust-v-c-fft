@@ -7,7 +7,7 @@ fn main() {
     let freq = 440.0;           // A4 note
     let fft_size = 1 << 24; // increase these to decrease bin size and thereby precision
 
-    // Generate 4096 samples of a 440 Hz sine wave
+    // Generate fft_size samples of a 440 Hz sine wave
     let samples: Vec<f32> = (0..fft_size)
         .map(|i| (2.0 * PI * freq * i as f32 / sample_rate).sin())
         .collect();
