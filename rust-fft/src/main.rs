@@ -47,4 +47,3 @@ fn main() {
     println!("Expected:    {:.2} Hz", freq);
     println!("Magnitude:   {:.4}", peak_mag);
 }
-
