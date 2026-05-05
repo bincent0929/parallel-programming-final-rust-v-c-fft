@@ -57,6 +57,7 @@ int main(void) {
         fftwf_free(buf);
         return 1;
     }
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for (size_t i = 0; i < num_bins; i++) {
         float re = buf[i][0];
         float im = buf[i][1];
