@@ -2,45 +2,74 @@ use rustfft::{num_complex::Complex, FftPlanner};
 use std::f32::consts::PI;
 use std::thread;
 
+const THREAD_COUNT: usize = 8;
+
 fn main() {
     let sample_rate = 44100.0;
-    let freq = 440.0;           // A4 note
-    let fft_size = 1 << 24; // increase these to decrease bin size and thereby precision
+    let freq = 440.0;
+    let fft_size = 1 << 16;
+    let chunk_size = (fft_size + THREAD_COUNT - 1) / THREAD_COUNT;
 
-    // Generate fft_size samples of a 440 Hz sine wave
-    let samples: Vec<f32> = (0..fft_size)
-        .map(|i| (2.0 * PI * freq * i as f32 / sample_rate).sin())
-        .collect();
+    // Generate samples — parallel
+    let mut samples = vec![0.0f32; fft_size];
+    thread::scope(|s| {
+        let mut handles = vec![];
+        for (t, slice) in samples.chunks_mut(chunk_size).enumerate() {
+            let start = t * chunk_size;
+            handles.push(s.spawn(move || {
+                for (i, sample) in slice.iter_mut().enumerate() {
+                    *sample = (2.0 * PI * freq * (start + i) as f32 / sample_rate).sin();
+                }
+            }));
+        }
+        for h in handles {
+            h.join().unwrap();
+        }
+    });
 
-    // Pack into complex buffer
-    let mut buffer: Vec<Complex<f32>> = samples
-        .iter()
-        .map(|&s| Complex::new(s, 0.0))
-        .collect();
+    // Pack into complex buffer — parallel
+    let mut buffer: Vec<Complex<f32>> = vec![Complex::new(0.0, 0.0); fft_size];
+    thread::scope(|s| {
+        let mut handles = vec![];
+        for (buf_slice, samp_slice) in
+            buffer.chunks_mut(chunk_size).zip(samples.chunks(chunk_size))
+        {
+            handles.push(s.spawn(move || {
+                for (b, &s_val) in buf_slice.iter_mut().zip(samp_slice.iter()) {
+                    *b = Complex::new(s_val, 0.0);
+                }
+            }));
+        }
+        for h in handles {
+            h.join().unwrap();
+        }
+    });
 
-    // FFT
+    // FFT — plan once per chunk size, each thread FFTs its chunk
     let mut planner = FftPlanner::new();
-    let fft = planner.plan_fft_forward(fft_size);
-    fft.process(&mut buffer);
+    let fft = planner.plan_fft_forward(chunk_size);
+    let bin_width = sample_rate / chunk_size as f32;
 
-    // Magnitudes (first half only — rest is mirror)
-    let bin_width = sample_rate / fft_size as f32;
-    let num_bins = fft_size / 2 + 1;
-    let magnitudes: Vec<f32> = buffer[..num_bins]
-        .iter()
-        .map(|c| c.norm())
-        .collect();
-
-    // Find peak
-    // the magnitudes are based on the magnitude of sin()
-    // which in this case is 1.0 and the fft_size / 2
-    // so for fft_size = 4096 then the peak should be around
-    // 2048
-    let (peak_bin, peak_mag) = magnitudes
-        .iter()
-        .enumerate()
-        .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
-        .unwrap();
+    let (peak_bin, peak_mag) = thread::scope(|s| {
+        let mut handles = vec![];
+        for chunk in buffer.chunks_mut(chunk_size) {
+            let fft = fft.clone();
+            handles.push(s.spawn(move || {
+                fft.process(chunk);
+                chunk[..chunk.len() / 2 + 1]
+                    .iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.norm().partial_cmp(&b.norm()).unwrap())
+                    .map(|(i, c)| (i, c.norm()))
+                    .unwrap()
+            }));
+        }
+        handles
+            .into_iter()
+            .map(|h| h.join().unwrap())
+            .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
+            .unwrap()
+    });
 
     println!("Bin width: {:.2} Hz", bin_width);
     println!("Peak at bin {} = {:.2} Hz", peak_bin, peak_bin as f32 * bin_width);
