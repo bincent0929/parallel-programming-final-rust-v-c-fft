@@ -228,6 +228,7 @@ fn parallel_fft(chunks: Vec<Vec<f32>>, num_workers: usize) -> Vec<Vec<f32>> {
         .into_iter()
         .map(|partition| {
             thread::spawn(move || {
+                // Seems like moving this planner outside will be more efficient
                 let mut planner = FftPlanner::<f32>::new();
                 let fft = planner.plan_fft_forward(CHUNK_SIZE);
 

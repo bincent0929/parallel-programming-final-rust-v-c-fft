@@ -11,5 +11,6 @@
 - [ ] Make a simple Rust FFT program
 - [ ] Vary problem size in addition to amount of threads if needed
 - [ ] Clearly state that FFT is the mathematical algo
+- [ ] Move the planner outside of the thread spawn and pass it in
 
 - [ ] Thursday during activity?
