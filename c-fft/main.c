@@ -3,7 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <omp.h>
+
 #define PI 3.14159265358979323846
+#ifndef THREAD_COUNT
+#define THREAD_COUNT 4
+#endif
 
 int main(void) {
     double sample_rate = 44100.0;
@@ -16,6 +21,7 @@ int main(void) {
         fprintf(stderr, "malloc failed\n");
         return 1;
     }
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for (size_t i = 0; i < fft_size; i++) {
         samples[i] = sinf(2.0f * (float)PI * (float)freq * (float)i / (float)sample_rate);
     }
@@ -27,6 +33,7 @@ int main(void) {
         free(samples);
         return 1;
     }
+    #pragma omp parallel for num_threads(THREAD_COUNT)
     for (size_t i = 0; i < fft_size; i++) {
         buf[i][0] = samples[i];
         buf[i][1] = 0.0f;
@@ -34,6 +41,9 @@ int main(void) {
     free(samples);
 
     /* FFT */
+    fftwf_init_threads();
+    // this uses pthreads
+    fftwf_plan_with_nthreads(THREAD_COUNT);
     fftwf_plan plan = fftwf_plan_dft_1d((int)fft_size, buf, buf,
                                          FFTW_FORWARD, FFTW_ESTIMATE);
     fftwf_execute(plan);
