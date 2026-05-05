@@ -1,2 +1,15 @@
 - [ ] Set up the program to take input for how many workers to use.
 - [ ] Create a report that outline the speed up and describes how the program works
+- [ ] Demonstrate saturation
+- [ ] Demo where code was parallelized
+- [ ] Demo what would be equivalent in C
+- [ ] Talk about compilation results
+- [ ] Amdahl's Law
+- [ ] Speedup
+    - [ ] Graph
+- [ ] Make a simple C OpenMP FFT program
+- [ ] Make a simple Rust FFT program
+- [ ] Vary problem size in addition to amount of threads if needed
+- [ ] Clearly state that FFT is the mathematical algo
+
+- [ ] Thursday during activity?
