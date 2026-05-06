@@ -1,7 +1,10 @@
 import re
 import glob
 from pathlib import Path
-
+import statistics as stat
+from collections import defaultdict
+import sys
+import csv
 
 def parse_time(time_str):
     """Convert '0m0.101s' to float seconds."""
@@ -59,12 +62,36 @@ def scan_directory(root):
     return results
 
 
-if __name__ == "__main__":
-    import sys
-    import csv
+def compute_stats(runs):
+    """Group runs by (language, thread_count) and compute mean + stdev of real_time."""
+    
+    groups = defaultdict(list)
+    for r in runs:
+        key = (r["language"], r["thread_count"])
+        groups[key].append(r["real_time"])
 
+    stats = []
+    for (lang, tc), times in sorted(groups.items()):
+        row = {
+            "language": lang,
+            "thread_count": tc,
+            "run_count": len(times),
+            "mean_real_time": round(stat.mean(times), 6),
+        }
+        try:
+            row["stdev_real_time"] = round(stat.stdev(times), 6)
+        except stat.StatisticsError:
+            row["stdev_real_time"] = ""
+        stats.append(row)
+
+    return stats
+
+
+if __name__ == "__main__":
+    
     root = sys.argv[1] if len(sys.argv) > 1 else "test-output"
     out  = sys.argv[2] if len(sys.argv) > 2 else "benchmark_results.csv"
+    stats_out = sys.argv[3] if len(sys.argv) > 3 else "benchmark_stats.csv"
 
     runs = scan_directory(root)
 
@@ -79,3 +106,13 @@ if __name__ == "__main__":
         writer.writerows(runs)
 
     print(f"Wrote {len(runs)} rows to {out}")
+
+    stats = compute_stats(runs)
+
+    stats_fields = ["language", "thread_count", "run_count", "mean_real_time", "stdev_real_time"]
+    with open(stats_out, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=stats_fields)
+        writer.writeheader()
+        writer.writerows(stats)
+
+    print(f"Wrote {len(stats)} rows to {stats_out}")
