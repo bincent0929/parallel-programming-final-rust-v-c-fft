@@ -2,7 +2,7 @@ use rustfft::{num_complex::Complex, FftPlanner};
 use std::f32::consts::PI;
 use std::thread;
 
-const THREAD_COUNT: usize = 8;
+include!(concat!(env!("OUT_DIR"), "/constants.rs"));
 
 fn main() {
     //let sample_rate = 44100.0; // CD quality sampling

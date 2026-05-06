@@ -1,6 +1,6 @@
-- [ ] Set up the program to take input for how many workers to use.
+- [x] Set up the program to take input for how many workers to use.
 - [ ] Create a report that outline the speed up and describes how the program works
-- [ ] Demonstrate saturation
+- [x] Demonstrate saturation
 - [ ] Demo where code was parallelized
 - [ ] Demo what would be equivalent in C
 - [ ] Talk about compilation results
