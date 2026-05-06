@@ -1,0 +1,14 @@
+---
+title: "Threading FFT In Rust vs. C Languages"
+format: pdf
+echo: false
+---
+
+``` {python}
+def speedup(t_1: float, t_2: float) -> float:
+    return t_1 / t_2
+
+def parallel_fraction(SU: float, N: int) -> float:
+    """Compute P% (percentage of the program that is parallelizable) from observed speedup and number of workers."""
+    return (SU - 1) / (SU * (1 - 1/N))
+```
