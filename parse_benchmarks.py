@@ -15,21 +15,38 @@ def parse_benchmark_file(path):
     text = path.read_text()
     lines = text.splitlines()
 
-    language = path.stem.split("_benchmark_results")[0]
-    n = int(lines[0].split("=")[1].strip())
+    # Extract machine from path: test-output/{machine}/{lang_dir}/{file}
+    machine = path.parent.parent.name if path.parent.parent.name != "test-output" else ""
+
+    # Extract language from parent directory (e.g. "C_lang" -> "C")
+    lang_dir = path.parent.name
+    language = lang_dir.replace("_lang", "")
+
+    thread_count = int(lines[0].split("=")[1].strip())
 
     runs = []
-    for integral_match, time_match in zip(
-        re.finditer(r"^of the integral .+=\s*([\d.]+)\s*$", text, re.MULTILINE),
-        re.finditer(r"^real\s+(\S+)", text, re.MULTILINE),
-    ):
-        runs.append({
-            "language": language,
-            "n": n,
-            "file": path.name,
-            "integral": float(integral_match.group(1)),
-            "real_time": parse_time(time_match.group(1)),
-        })
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^Run (\d+):", lines[i])
+        if m:
+            run_num = int(m.group(1))
+            peak = float(re.search(r"Peak at bin \d+ = ([\d.]+) Hz", lines[i + 2]).group(1))
+            mag = float(re.search(r"Magnitude:\s+([\d.]+)", lines[i + 4]).group(1))
+            real = parse_time(re.search(r"real\s+(\S+)", lines[i + 6]).group(1))
+
+            runs.append({
+                "machine": machine,
+                "language": language,
+                "thread_count": thread_count,
+                "run": run_num,
+                "file": path.name,
+                "peak_frequency": peak,
+                "magnitude": mag,
+                "real_time": real,
+            })
+            i += 1
+        else:
+            i += 1
 
     return runs
 
@@ -46,13 +63,18 @@ if __name__ == "__main__":
     import sys
     import csv
 
-    root = sys.argv[1] if len(sys.argv) > 1 else "test-output/mac-mini"
+    root = sys.argv[1] if len(sys.argv) > 1 else "test-output"
     out  = sys.argv[2] if len(sys.argv) > 2 else "benchmark_results.csv"
 
     runs = scan_directory(root)
 
+    fieldnames = [
+        "machine", "language", "thread_count", "run", "file",
+        "peak_frequency", "magnitude", "real_time"
+    ]
+
     with open(out, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["language", "n", "file", "integral", "real_time"])
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(runs)
 
