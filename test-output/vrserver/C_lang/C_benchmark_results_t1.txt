@@ -1,0 +1,102 @@
+thread_count = 1
+
+Run 1:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.828s
+user	0m1.614s
+sys	0m0.214s
+
+Run 2:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.826s
+user	0m1.612s
+sys	0m0.214s
+
+Run 3:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.822s
+user	0m1.608s
+sys	0m0.214s
+
+Run 4:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.822s
+user	0m1.605s
+sys	0m0.216s
+
+Run 5:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.833s
+user	0m1.624s
+sys	0m0.209s
+
+Run 6:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.836s
+user	0m1.621s
+sys	0m0.215s
+
+Run 7:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.827s
+user	0m1.612s
+sys	0m0.215s
+
+Run 8:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.813s
+user	0m1.601s
+sys	0m0.212s
+
+Run 9:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.820s
+user	0m1.593s
+sys	0m0.227s
+
+Run 10:
+Bin width: 0.00 Hz
+Peak at bin 669567 = 440.00 Hz
+Expected:    440.00 Hz
+Magnitude:   32869220.0000
+
+real	0m1.851s
+user	0m1.620s
+sys	0m0.231s
+
