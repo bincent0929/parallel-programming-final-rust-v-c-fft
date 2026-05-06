@@ -5,9 +5,10 @@ use std::thread;
 const THREAD_COUNT: usize = 8;
 
 fn main() {
-    let sample_rate = 44100.0;
-    let freq = 440.0;
-    let fft_size = 1 << 16;
+    //let sample_rate = 44100.0; // CD quality sampling
+    let sample_rate = 192000.0; // Studio master quality sampling
+    let freq = 440.0; // A4
+    let fft_size = 1 << 26;
     let chunk_size = (fft_size + THREAD_COUNT - 1) / THREAD_COUNT;
 
     // Generate samples — parallel
@@ -45,7 +46,7 @@ fn main() {
         }
     });
 
-    // FFT — plan once per chunk size, each thread FFTs its chunk
+    // FFT — plan once, each thread FFTs its chunk using the same plan
     let mut planner = FftPlanner::new();
     let fft = planner.plan_fft_forward(chunk_size);
     let bin_width = sample_rate / chunk_size as f32;
