@@ -67,12 +67,13 @@ def compute_stats(runs):
     
     groups = defaultdict(list)
     for r in runs:
-        key = (r["language"], r["thread_count"])
+        key = (r["language"], r["thread_count"], r["machine"])
         groups[key].append(r["real_time"])
 
     stats = []
-    for (lang, tc), times in sorted(groups.items()):
+    for (lang, tc, mach), times in sorted(groups.items()):
         row = {
+            "machine": mach,
             "language": lang,
             "thread_count": tc,
             "run_count": len(times),
@@ -109,7 +110,7 @@ if __name__ == "__main__":
 
     stats = compute_stats(runs)
 
-    stats_fields = ["language", "thread_count", "run_count", "mean_real_time", "stdev_real_time"]
+    stats_fields = ["machine", "language", "thread_count", "run_count", "mean_real_time", "stdev_real_time"]
     with open(stats_out, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=stats_fields)
         writer.writeheader()
