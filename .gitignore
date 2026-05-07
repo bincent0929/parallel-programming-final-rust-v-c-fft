@@ -8,3 +8,4 @@ c-fft/fft*
 report_files/
 *.quarto_*
 report.html
+report.pdf
