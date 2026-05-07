@@ -1,7 +1,7 @@
 machine,language,thread_count,run_count,mean_real_time,stdev_real_time
-vrserver,C,1,10,1.8278,0.010454
-vrserver,C,4,10,0.7727,0.021929
-vrserver,C,8,10,0.6952,0.011755
-vrserver,rust,1,10,3.1425,0.035557
-vrserver,rust,4,10,1.146,0.013719
-vrserver,rust,8,10,0.8976,0.014661
+vrserver,C,1,20,1.9275,0.066236
+vrserver,C,4,20,0.86525,0.025625
+vrserver,C,8,20,0.77965,0.011771
+vrserver,rust,1,20,3.18535,0.019307
+vrserver,rust,4,20,1.18985,0.01362
+vrserver,rust,8,20,0.9294,0.006684

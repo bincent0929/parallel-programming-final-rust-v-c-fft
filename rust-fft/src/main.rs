@@ -5,8 +5,7 @@ use std::thread;
 include!(concat!(env!("OUT_DIR"), "/constants.rs"));
 
 fn main() {
-    //let sample_rate = 44100.0; // CD quality sampling
-    let sample_rate = 192000.0; // Studio master quality sampling
+    let sample_rate = 44100.0; // CD quality sampling
     let freq = 440.0; // A4
     let fft_size = 1 << 26;
     let chunk_size = (fft_size + THREAD_COUNT - 1) / THREAD_COUNT;

@@ -1,7 +1,7 @@
 CC = gcc
 THREAD_COUNT ?= 4
-CFLAGS = -Wall -O2 -fopenmp -DTHREAD_COUNT=$(THREAD_COUNT)
-LDFLAGS = -lfftw3f -lfftw3f_threads -lm -fopenmp
+CFLAGS = -Wall -Ofast -fopenmp -DTHREAD_COUNT=$(THREAD_COUNT)
+LDFLAGS = -lfftw3f_omp -lfftw3f -lm -fopenmp
 
 TARGET = fft_t$(THREAD_COUNT)
 

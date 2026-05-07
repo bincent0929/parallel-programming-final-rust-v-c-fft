@@ -17,13 +17,49 @@ def speedup(t_1: float, t_2: float) -> tuple[float, bool]:
 
 def parallel_fraction(SU: float, N: int) -> float:
     """
-    Compute P% (percentage of the program that is parallelizable) from observed speedup and number of workers.
+    Compute P% (percentage of the program that is 
+    parallelizable) from observed speedup and number of workers.
     Parameters: SU | Speedup, N | thread/core count
     """
     return (SU - 1) / (SU * (1 - 1/N))
 ```
 
-# Time by Thread Count
+# What I'm Researching
+
+The goal of this report is to compare the effects of threading the FFT algorithm in both the C language and the Rust language.
+
+## Input Data Used
+
+I used `sin()` to generate waves for the FFT algorithm.
+Wave Parameters:
+- Frequency
+    - 440 hz
+- Sample Rate
+    - 44100.0 hz
+
+## Libraries Used
+
+### C
+#### Threading: 
+- OpenMP
+#### FFT
+- `fftw3`
+
+### Rust
+#### Threading: 
+- `std::thread`
+#### FFT
+- rustfft
+    - `num_complex::Complex` 
+    - `FftPlanner`
+
+## Threading Methodology
+
+In C, the threading was already implemented for the FFT algorithm. It was implemented using pthreads
+
+# Data
+
+## Time by Thread Count
 ``` {python}
 import pandas as pd # for referencing the csv
 import matplotlib.pyplot as plt
@@ -70,3 +106,6 @@ print(f"C 8t vs Rust 8t: {c_v_rust_8t:.2f}x ({'Rust' if second_faster_8 else 'C'
 print(f"C P%: {parallel_fraction(C_seq_v_4, 4):.2%}")
 print(f"Rust P%: {parallel_fraction(Rust_seq_v_4, 4):.2%}")
 ```
+
+# Conclusions
+
