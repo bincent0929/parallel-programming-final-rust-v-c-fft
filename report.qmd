@@ -145,7 +145,19 @@ Swap:          4.0Gi       0.0Ki       4.0Gi
 
 ## Threading Methodology
 
-In C, the threading was already implemented for the FFT algorithm. It was implemented using pthreads
+In C, the threading was already implemented for the FFT algorithm. It was implemented using OpenMP.
+
+Rust was implemented using chunks of the buffer and then spawning a thread per each chunk and running FFT on each chunk.
+
+
+::: {.callout-caution}
+
+The peak magnitude is different between thread counts for the Rust implementation.
+
+This is due to the fact that the FFT equation's max possible peak is relative to how many samples are available to be processed. So no peak will be any greater than $1 / THREAD_COUNT$ for parallelized FFTs in Rust.
+
+:::
+
 
 # Data
 

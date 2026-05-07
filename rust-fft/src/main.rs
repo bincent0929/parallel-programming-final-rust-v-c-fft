@@ -50,6 +50,11 @@ fn main() {
     let fft = planner.plan_fft_forward(chunk_size);
     let bin_width = sample_rate / chunk_size as f32;
 
+    /*
+     * This does not work!
+     * It does not return the correct peak magnitude.
+     * The FFT
+     */
     let (peak_bin, peak_mag) = thread::scope(|s| {
         let mut handles = vec![];
         for chunk in buffer.chunks_mut(chunk_size) {
@@ -74,5 +79,5 @@ fn main() {
     println!("Bin width: {:.2} Hz", bin_width);
     println!("Peak at bin {} = {:.2} Hz", peak_bin, peak_bin as f32 * bin_width);
     println!("Expected:    {:.2} Hz", freq);
-    println!("Magnitude:   {:.4}", peak_mag);
+    println!("Approximate Magnitude:   {:.4}", peak_mag * THREAD_COUNT as f32);
 }
