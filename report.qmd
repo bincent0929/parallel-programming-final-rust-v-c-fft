@@ -1,14 +1,72 @@
 ---
 title: "Threading FFT In Rust vs. C Languages"
-format: pdf
+format: html
 echo: false
+author: "Vincent Roberson"
 ---
 
 ``` {python}
-def speedup(t_1: float, t_2: float) -> float:
-    return t_1 / t_2
+def speedup(t_1: float, t_2: float) -> tuple[float, bool]:
+    """The multiplier speedup of one greater runtime vs. another"""
+    if t_1 <= 0.0 or t_2 <= 0.0:
+        raise ValueError("The runtimes must be greater than 0")
+    elif t_1 > t_2:
+        return (t_1 / t_2, True)
+    else:
+        return (t_2 / t_1, False)
 
 def parallel_fraction(SU: float, N: int) -> float:
-    """Compute P% (percentage of the program that is parallelizable) from observed speedup and number of workers."""
+    """
+    Compute P% (percentage of the program that is parallelizable) from observed speedup and number of workers.
+    Parameters: SU | Speedup, N | thread/core count
+    """
     return (SU - 1) / (SU * (1 - 1/N))
+```
+
+# Time by Thread Count
+``` {python}
+import pandas as pd # for referencing the csv
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("benchmark_stats.csv")
+
+fig, ax = plt.subplots()
+
+for lang in ["C", "rust"]:
+    sub = df[df.language == lang]
+    ax.errorbar(
+        sub.thread_count, sub.mean_real_time, yerr=sub.stdev_real_time,
+        marker="o", label=f"{lang} (10 runs)"
+    )
+
+ax.set_xlabel("Thread count")
+ax.set_ylabel("Mean real time (s)")
+ax.legend()
+```
+
+## Speedups
+```{python}
+C_seq_v_4, _ = speedup(df.loc[0, "mean_real_time"], df.loc[1, "mean_real_time"])
+C_seq_v_8, _ = speedup(df.loc[0, "mean_real_time"], df.loc[2, "mean_real_time"])
+print(f"C 1→4: {C_seq_v_4:.2f}x")
+print(f"C 1→8: {C_seq_v_8:.2f}x")
+
+Rust_seq_v_4, _ = speedup(df.loc[3, "mean_real_time"], df.loc[4, "mean_real_time"])
+Rust_seq_v_8, _ = speedup(df.loc[3, "mean_real_time"], df.loc[5, "mean_real_time"])
+print(f"Rust 1→4: {Rust_seq_v_4:.2f}x")
+print(f"Rust 1→8: {Rust_seq_v_8:.2f}x")
+
+c_v_rust_seq, second_faster = speedup(df.loc[0, "mean_real_time"], df.loc[3, "mean_real_time"])
+c_v_rust_4t, second_faster_4 = speedup(df.loc[1, "mean_real_time"], df.loc[4, "mean_real_time"])
+c_v_rust_8t, second_faster_8 = speedup(df.loc[2, "mean_real_time"], df.loc[5, "mean_real_time"])
+
+print(f"C seq vs Rust seq: {c_v_rust_seq:.2f}x ({'Rust' if second_faster else 'C'} faster)")
+print(f"C 4t vs Rust 4t: {c_v_rust_4t:.2f}x ({'Rust' if second_faster_4 else 'C'} faster)")
+print(f"C 8t vs Rust 8t: {c_v_rust_8t:.2f}x ({'Rust' if second_faster_8 else 'C'} faster)")
+```
+
+## Parallel Percentage Estimate
+```{python}
+print(f"C P%: {parallel_fraction(C_seq_v_4, 4):.2%}")
+print(f"Rust P%: {parallel_fraction(Rust_seq_v_4, 4):.2%}")
 ```

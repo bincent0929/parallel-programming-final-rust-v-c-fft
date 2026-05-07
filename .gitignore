@@ -4,3 +4,7 @@ audio-files/
 *.png
 .vscode/
 c-fft/fft*
+# quarto
+report_files/
+*.quarto_*
+report.html
