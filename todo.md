@@ -15,3 +15,6 @@
 - [x] Move the planner outside of the thread spawn and pass it in
 
 - [ ] Thursday during activity?
+
+
+- [ ] Add Scaling percentage speedup / linear ideal to data
