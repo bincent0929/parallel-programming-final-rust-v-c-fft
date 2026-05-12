@@ -1,7 +1,7 @@
 target/
 Cargo.lock
 audio-files/
-*.png
+
 .vscode/
 c-fft/fft*
 # quarto

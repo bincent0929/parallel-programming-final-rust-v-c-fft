@@ -26,7 +26,15 @@ def parallel_fraction(SU: float, N: int) -> float:
 
 # What I'm Researching
 
-The goal of this report is to compare the effects of threading the FFT algorithm in both the C language and the Rust language.
+The goal of this report is to compare the effects of threading an FFT algorithm in both the C language and the Rust language.
+
+## What is FFT?
+
+FFT is the abbreviation for Fast Fourier Transform. A Fourier Transform is an algorithm that takes a wave signal over time and extracts how much of a frequency there is in the wave signal.
+
+A common application that you may have seen for this algorithm is to create a spectrogram. For music, a spectrogram basically tells you how much of a frequency there is plotted over the time of the audio that you're listening to.
+
+The "Fast" in the name relates to the fact that it has been made more efficient over time relative to the original Fourier Transform algorithm. For example, the Cooley–Tukey algorithm. Which you can read more about [here](https://en.wikipedia.org/wiki/Fast_Fourier_transform#Algorithms:~:text=%5Bedit%5D-,Cooley%E2%80%93Tukey%20algorithm,-%5Bedit%5D)
 
 ## Input Data Used
 
@@ -34,9 +42,19 @@ I used $\sin()$ to generate waves for the FFT algorithm.
 Wave Parameters:
 
 - Frequency
-    - $440$ hz
+    - $440$ hz (A4 note. What all notes are based on in modern music)
 - Sample Rate
-    - $44100.0$ hz
+    - $44100.0$ hz (default for CDs)
+- FFT Size
+    - $1 << 26 = 67,108,864$
+
+### Implications of the Input Data
+
+By using a sine wave, we can expect that the peak magnitude (our goal value) will be half of the size of what we choose for our FFT size.
+
+This is due to the form of the DFT (Discrete Fourier Transform) equation $\sin(\theta) = \frac{e^{j\theta} - e^{-j\theta}}{2j}$; which ends up simplifying to $N / 2$ when computed with a pure sine wave.
+
+![](440hz-sine-wave-spectrogram.png)
 
 ## Libraries Used
 
@@ -55,7 +73,7 @@ Wave Parameters:
 
 #### FFT
 - rustfft
-    - `num_complex::Complex` 
+    - `num_complex::Complex`
     - `FftPlanner`
 
 ## Compiling
@@ -175,7 +193,7 @@ I ran the `c-fft/main.c` and `rust-fft/src/main.rs` programs using the `benchmar
 
 The output for the `bash` program can be found in `test-output/vrserver/`. "vrserver" being the name of my machine that I tested on.
 
-I scraped the data from the output files using `parse_benchmarks.py`. The output for the parsing can be found in the `csv` files that are in the root of the project.
+I scraped the data from the output files using `parse_benchmarks.py`. The output for the parsing can be found in the `.csv` files that are in the root of the project.
 
 ## Data Results
 
@@ -245,7 +263,7 @@ Which is surprising because the C program was actually theoretically less parall
 
 With my "vrserver" machine, under the conditions I have set for testing in this research, I can conclude that the C programming language running OpenMP using the `fftw3` threading library in `c-fft/main.c` runs faster than the Rust language running its standard threading library and `rustfft` in `rust-fft/src/main.rs`.
 
-I can also conclude that Rust benefits more from higher thread counts than C. Though more of the Rust code was parallelizable than the C code.
+I can also conclude that Rust benefits more from higher thread counts than C in this case. Though more of the Rust code was parallelizable than the C code in theory.
 
 ### Reasoning For Results
 

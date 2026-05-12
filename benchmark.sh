@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LANG_ARG="$1" # rust or python
+LANG_ARG="$1" # rust or C
 MACH_DIR_ARG="$2" # the name for the machine you're testing on
 RUN_COUNT_ARG="${3:-5}" # how many runs you want to do
 FULL_DIR="./test-output/${MACH_DIR_ARG}"
