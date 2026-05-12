@@ -15,6 +15,12 @@ def speedup(t_1: float, t_2: float) -> tuple[float, bool]:
     else:
         return (t_2 / t_1, False)
 
+def speedup_percentage(SU: float, N: int) -> float:
+    """
+    What percent of the ideal speedup was achieved
+    """
+    return (SU / N) * 100
+
 def parallel_fraction(SU: float, N: int) -> float:
     """
     Compute P% (percentage of the program that is 
@@ -223,19 +229,28 @@ ax.legend()
 ### Speedups
 ```{python}
 C_seq_v_4, _ = speedup(df.loc[0, "mean_real_time"], df.loc[1, "mean_real_time"])
+C_seq_v_4_sp = speedup_percentage(C_seq_v_4, 4)
 C_seq_v_8, _ = speedup(df.loc[0, "mean_real_time"], df.loc[2, "mean_real_time"])
+C_seq_v_8_sp = speedup_percentage(C_seq_v_8, 8)
 print(f"C 1→4: {C_seq_v_4:.2f}x")
+print(f"    Percentage of linear ideal speedup achieved: {C_seq_v_4_sp:.2f}")
 print(f"C 1→8: {C_seq_v_8:.2f}x")
+print(f"    Percentage of linear ideal speedup achieved: {C_seq_v_8_sp:.2f}")
 
 Rust_seq_v_4, _ = speedup(df.loc[3, "mean_real_time"], df.loc[4, "mean_real_time"])
+Rust_seq_v_4_sp = speedup_percentage(Rust_seq_v_4, 4)
 Rust_seq_v_8, _ = speedup(df.loc[3, "mean_real_time"], df.loc[5, "mean_real_time"])
+Rust_seq_v_8_sp = speedup_percentage(Rust_seq_v_8, 8)
 print(f"Rust 1→4: {Rust_seq_v_4:.2f}x")
+print(f"    Percentage of linear ideal speedup achieved: {Rust_seq_v_4_sp:.2f}")
 print(f"Rust 1→8: {Rust_seq_v_8:.2f}x")
+print(f"    Percentage of linear ideal speedup achieved: {Rust_seq_v_8_sp:.2f}")
 
 c_v_rust_seq, second_faster = speedup(df.loc[0, "mean_real_time"], df.loc[3, "mean_real_time"])
 c_v_rust_4t, second_faster_4 = speedup(df.loc[1, "mean_real_time"], df.loc[4, "mean_real_time"])
 c_v_rust_8t, second_faster_8 = speedup(df.loc[2, "mean_real_time"], df.loc[5, "mean_real_time"])
 
+print("\n")
 print(f"C seq vs Rust seq: {c_v_rust_seq:.2f}x ({'Rust' if second_faster else 'C'} faster)")
 print(f"C 4t vs Rust 4t: {c_v_rust_4t:.2f}x ({'Rust' if second_faster_4 else 'C'} faster)")
 print(f"C 8t vs Rust 8t: {c_v_rust_8t:.2f}x ({'Rust' if second_faster_8 else 'C'} faster)")
@@ -255,17 +270,19 @@ Both threading methods in C and Rust did improve the speed of the base program b
 
 Rust saw the greatest speedup with a $3.43$ times increase in speedup from $1$ thread to $8$ threads.
 
-Nevertheless across all thread counts, C was faster than Rust by at least $1.38$ times.
+Nevertheless across all thread counts, C was faster than Rust by at least $1.19$ times.
 
-Which is surprising because the C program was actually theoretically less parallelizaable at $73.48%$ parallelizable vs. Rust at $83.53%$.
+Which is surprising because the C program was actually theoretically less parallelizaable at $73.48$% parallelizable vs. Rust at $83.53$%.
 
 ## Conclusions
 
 With my "vrserver" machine, under the conditions I have set for testing in this research, I can conclude that the C programming language running OpenMP using the `fftw3` threading library in `c-fft/main.c` runs faster than the Rust language running its standard threading library and `rustfft` in `rust-fft/src/main.rs`.
 
-I can also conclude that Rust benefits more from higher thread counts than C in this case. Though more of the Rust code was parallelizable than the C code in theory.
+I can also conclude that Rust benefits more from higher thread counts than C in this case. Even though more of the Rust code was parallelizable than the C code in theory.
 
 ### Reasoning For Results
+
+I believe that the program did not see a much faster speedup between 4 threads and 8 threads due to a problem size that was too small. I could run it again at a higher problem size but I did not have enough time to do it.
 
 I believe the reason that Rust performed slower than C is due to differences in optimization between the languages.
 
