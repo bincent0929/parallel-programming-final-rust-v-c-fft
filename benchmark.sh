@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Example usage:
+# ./benchmark.sh rust {your_device_name} 20
+
 LANG_ARG="$1" # rust or C
 MACH_DIR_ARG="$2" # the name for the machine you're testing on
 RUN_COUNT_ARG="${3:-5}" # how many runs you want to do
@@ -30,3 +33,6 @@ for N in "${THREAD_COUNT_VALUES[@]}"; do
         echo "" >> "$OUTPUT"
     done
 done
+
+echo 'Run `python3 parse_benchmarks.py` once this is done to compile the results into a .csv file.'
+
