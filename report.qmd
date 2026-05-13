@@ -262,17 +262,23 @@ print(f"C P%: {parallel_fraction(C_seq_v_4, 4):.2%}")
 print(f"Rust P%: {parallel_fraction(Rust_seq_v_4, 4):.2%}")
 ```
 
+```{python}
+#| echo: false
+min_speedup = min(C_seq_v_4, C_seq_v_8, Rust_seq_v_4, Rust_seq_v_8)
+min_c_over_rust = min(c_v_rust_seq, c_v_rust_4t, c_v_rust_8t)
+```
+
 ## Data Analysis
 
 The runtimes for Rust had a lower standard deviation than C.
 
-Both threading methods in C and Rust did improve the speed of the base program by at least $2$ times.
+Both threading methods in C and Rust did improve the speed of the base program by at least `{python} f"{min_speedup:.2f}"` times.
 
-Rust saw the greatest speedup with a $3.43$ times increase in speedup from $1$ thread to $8$ threads.
+Rust saw the greatest speedup with a `{python} f"{Rust_seq_v_8:.2f}"` times increase in speedup from $1$ thread to $8$ threads.
 
-Nevertheless across all thread counts, C was faster than Rust by at least $1.19$ times.
+Nevertheless across all thread counts, C was faster than Rust by at least `{python} f"{min_c_over_rust:.2f}"` times.
 
-Which is surprising because the C program was actually theoretically less parallelizaable at $73.48$% parallelizable vs. Rust at $83.53$%.
+Which is surprising because the C program was actually theoretically less parallelizaable at `{python} f"{parallel_fraction(C_seq_v_4, 4):.2%}"` parallelizable vs. Rust at `{python} f"{parallel_fraction(Rust_seq_v_4, 4):.2%}"`.
 
 ## Conclusions
 
