@@ -7,7 +7,7 @@ include!(concat!(env!("OUT_DIR"), "/constants.rs"));
 fn main() {
     let sample_rate = 44100.0; // CD quality sampling
     let freq = 440.0; // A4
-    let fft_size = 1 << 26;
+    let fft_size = 1 << 29;
     let chunk_size = (fft_size + THREAD_COUNT - 1) / THREAD_COUNT;
 
     // Generate samples — parallel
@@ -44,6 +44,7 @@ fn main() {
             h.join().unwrap();
         }
     });
+    drop(samples);
 
     // FFT — plan once, each thread FFTs its chunk using the same plan
     let mut planner = FftPlanner::new();

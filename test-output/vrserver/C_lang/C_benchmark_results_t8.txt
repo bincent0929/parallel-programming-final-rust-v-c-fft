@@ -2,201 +2,201 @@ thread_count = 8
 
 Run 1:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.783s
-user	0m4.328s
-sys	0m0.456s
+real	0m7.999s
+user	0m45.559s
+sys	0m3.291s
 
 Run 2:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.803s
-user	0m4.238s
-sys	0m0.474s
+real	0m7.998s
+user	0m46.167s
+sys	0m3.314s
 
 Run 3:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.770s
-user	0m4.186s
-sys	0m0.469s
+real	0m7.972s
+user	0m45.960s
+sys	0m3.352s
 
 Run 4:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.801s
-user	0m4.042s
-sys	0m0.510s
+real	0m7.954s
+user	0m46.066s
+sys	0m3.326s
 
 Run 5:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.771s
-user	0m4.160s
-sys	0m0.484s
+real	0m8.054s
+user	0m46.278s
+sys	0m3.430s
 
 Run 6:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.779s
-user	0m4.055s
-sys	0m0.497s
+real	0m8.002s
+user	0m46.190s
+sys	0m3.369s
 
 Run 7:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.785s
-user	0m4.090s
-sys	0m0.469s
+real	0m8.040s
+user	0m45.967s
+sys	0m3.378s
 
 Run 8:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.781s
-user	0m4.156s
-sys	0m0.462s
+real	0m7.918s
+user	0m45.467s
+sys	0m3.411s
 
 Run 9:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.772s
-user	0m3.997s
-sys	0m0.487s
+real	0m7.951s
+user	0m46.171s
+sys	0m3.384s
 
 Run 10:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.785s
-user	0m4.138s
-sys	0m0.475s
+real	0m7.992s
+user	0m45.780s
+sys	0m3.372s
 
 Run 11:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.766s
-user	0m4.154s
-sys	0m0.471s
+real	0m8.002s
+user	0m45.471s
+sys	0m3.348s
 
 Run 12:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.772s
-user	0m4.192s
-sys	0m0.449s
+real	0m8.053s
+user	0m46.034s
+sys	0m3.363s
 
 Run 13:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.785s
-user	0m4.073s
-sys	0m0.502s
+real	0m7.977s
+user	0m45.738s
+sys	0m3.342s
 
 Run 14:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.779s
-user	0m4.114s
-sys	0m0.473s
+real	0m8.006s
+user	0m45.994s
+sys	0m3.414s
 
 Run 15:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.769s
-user	0m4.084s
-sys	0m0.507s
+real	0m8.050s
+user	0m45.656s
+sys	0m3.343s
 
 Run 16:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.772s
-user	0m4.070s
-sys	0m0.481s
+real	0m8.002s
+user	0m46.205s
+sys	0m3.416s
 
 Run 17:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.798s
-user	0m4.225s
-sys	0m0.486s
+real	0m7.952s
+user	0m46.064s
+sys	0m3.403s
 
 Run 18:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.758s
-user	0m3.981s
-sys	0m0.483s
+real	0m7.943s
+user	0m45.674s
+sys	0m3.361s
 
 Run 19:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.788s
-user	0m4.247s
-sys	0m0.483s
+real	0m7.950s
+user	0m45.435s
+sys	0m3.426s
 
 Run 20:
 Bin width: 0.00 Hz
-Peak at bin 669567 = 440.00 Hz
+Peak at bin 5356535 = 440.00 Hz
 Expected:    440.00 Hz
-Magnitude:   33046238.0000
+Magnitude:   187774832.0000
 
-real	0m0.776s
-user	0m4.155s
-sys	0m0.482s
+real	0m8.019s
+user	0m46.110s
+sys	0m3.327s
 

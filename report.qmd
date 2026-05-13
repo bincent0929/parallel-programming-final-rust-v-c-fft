@@ -218,7 +218,7 @@ for lang in ["C", "rust"]:
     sub = df[df.language == lang]
     ax.errorbar(
         sub.thread_count, sub.mean_real_time, yerr=sub.stdev_real_time,
-        marker="o", label=f"{lang} (10 runs)"
+        marker="o", label=f"{lang} (20 runs)"
     )
 
 ax.set_xlabel("Thread count")

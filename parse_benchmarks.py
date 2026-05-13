@@ -33,23 +33,22 @@ def parse_benchmark_file(path):
         m = re.match(r"^Run (\d+):", lines[i])
         if m:
             run_num = int(m.group(1))
-            peak = float(re.search(r"Peak at bin \d+ = ([\d.]+) Hz", lines[i + 2]).group(1))
-            mag = float(re.search(r"Magnitude:\s+([\d.]+)", lines[i + 4]).group(1))
-            real = parse_time(re.search(r"real\s+(\S+)", lines[i + 6]).group(1))
-
-            runs.append({
-                "machine": machine,
-                "language": language,
-                "thread_count": thread_count,
-                "run": run_num,
-                "file": path.name,
-                "peak_frequency": peak,
-                "magnitude": mag,
-                "real_time": real,
-            })
-            i += 1
-        else:
-            i += 1
+            block = "\n".join(lines[i + 1:i + 11])
+            peak_m = re.search(r"Peak at bin \d+ = ([\d.]+) Hz", block)
+            mag_m  = re.search(r"Magnitude:\s+([\d.]+)", block)
+            real_m = re.search(r"real\s+(\S+)", block)
+            if peak_m and mag_m and real_m:
+                runs.append({
+                    "machine": machine,
+                    "language": language,
+                    "thread_count": thread_count,
+                    "run": run_num,
+                    "file": path.name,
+                    "peak_frequency": float(peak_m.group(1)),
+                    "magnitude": float(mag_m.group(1)),
+                    "real_time": parse_time(real_m.group(1)),
+                })
+        i += 1
 
     return runs
 

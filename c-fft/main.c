@@ -13,7 +13,7 @@
 int main(void) {
     double sample_rate = 44100.0;
     double freq = 440.0;
-    size_t fft_size = 1 << 26;
+    size_t fft_size = 1 << 29;
 
     /* generate sine wave */
     float *samples = malloc(fft_size * sizeof(float));
