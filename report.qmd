@@ -5,31 +5,6 @@ echo: false
 author: "Vincent Roberson"
 ---
 
-``` {python}
-def speedup(t_1: float, t_2: float) -> tuple[float, bool]:
-    """The multiplier speedup of one greater runtime vs. another"""
-    if t_1 <= 0.0 or t_2 <= 0.0:
-        raise ValueError("The runtimes must be greater than 0")
-    elif t_1 > t_2:
-        return (t_1 / t_2, True)
-    else:
-        return (t_2 / t_1, False)
-
-def speedup_percentage(SU: float, N: int) -> float:
-    """
-    What percent of the ideal speedup was achieved
-    """
-    return (SU / N) * 100
-
-def parallel_fraction(SU: float, N: int) -> float:
-    """
-    Compute P% (percentage of the program that is 
-    parallelizable) from observed speedup and number of workers.
-    Parameters: SU | Speedup, N | thread/core count
-    """
-    return (SU - 1) / (SU * (1 - 1/N))
-```
-
 # What I'm Researching
 
 The goal of this report is to compare the effects of threading an FFT algorithm in both the C language and the Rust language.
@@ -40,7 +15,9 @@ FFT is the abbreviation for Fast Fourier Transform. A Fourier Transform is an al
 
 A common application that you may have seen for this algorithm is to create a spectrogram. For music, a spectrogram basically tells you how much of a frequency there is plotted over the time of the audio that you're listening to.
 
-The "Fast" in the name relates to the fact that it has been made more efficient over time relative to the original Fourier Transform algorithm. For example, the Cooley–Tukey algorithm. Which you can read more about [here](https://en.wikipedia.org/wiki/Fast_Fourier_transform#Algorithms:~:text=%5Bedit%5D-,Cooley%E2%80%93Tukey%20algorithm,-%5Bedit%5D)
+The "Fast" in the name relates to the fact that it has been made more efficient over time relative to the original Fourier Transform algorithm. For example, the Cooley–Tukey algorithm. Which you can read more about [here](https://en.wikipedia.org/wiki/Fast_Fourier_transform#Algorithms:~:text=%5Bedit%5D-,Cooley%E2%80%93Tukey%20algorithm,-%5Bedit%5D).
+
+I am not sure exactly how the libraries that I used implemented the algorithm.
 
 ## Input Data Used
 
@@ -52,7 +29,7 @@ Wave Parameters:
 - Sample Rate
     - $44100.0$ hz (default for CDs)
 - FFT Size
-    - $1 << 26 = 67,108,864$
+    - $1 << 29 = 2^{29}$
 
 ### Implications of the Input Data
 
@@ -94,6 +71,14 @@ This is due to the form of the DFT (Discrete Fourier Transform) equation $\sin(\
 
 - `rustflags = ["-C", "target-cpu=native"]`
     - `target-cpu=native` is most relevant to speeding up mathematical operations.
+
+
+::: {.callout-warning}
+
+I believe that this `profile.release` wasn't applied because I don't have it in the `Cargo.toml` that's in the root directory of the repository. The compiler tells you that there any error when building about it. But I still want to note it in here.
+
+:::
+
 
 ```toml
 [profile.release]
@@ -227,6 +212,34 @@ ax.legend()
 ```
 
 ### Speedups
+
+I'm using these functions to calculate the speedups, linear ideal vs. found speedup, and what percentage of the program is parallelizable (see the repo `.qmd` for how they were used):
+``` {python}
+#| echo: true
+def speedup(t_1: float, t_2: float) -> tuple[float, bool]:
+    """The multiplier speedup of one greater runtime vs. another"""
+    if t_1 <= 0.0 or t_2 <= 0.0:
+        raise ValueError("The runtimes must be greater than 0")
+    elif t_1 > t_2:
+        return (t_1 / t_2, True)
+    else:
+        return (t_2 / t_1, False)
+
+def speedup_percentage(SU: float, N: int) -> float:
+    """
+    What percent of the ideal speedup was achieved
+    """
+    return (SU / N) * 100
+
+def parallel_fraction(SU: float, N: int) -> float:
+    """
+    Compute P% (percentage of the program that is 
+    parallelizable) from observed speedup and number of workers.
+    Parameters: SU | Speedup, N | thread/core count
+    """
+    return (SU - 1) / (SU * (1 - 1/N))
+```
+
 ```{python}
 C_seq_v_4, _ = speedup(df.loc[0, "mean_real_time"], df.loc[1, "mean_real_time"])
 C_seq_v_4_sp = speedup_percentage(C_seq_v_4, 4)
@@ -258,42 +271,42 @@ print(f"C 8t vs Rust 8t: {c_v_rust_8t:.2f}x ({'Rust' if second_faster_8 else 'C'
 
 ### Parallel Percentage Estimate
 ```{python}
-print(f"C P%: {parallel_fraction(C_seq_v_4, 4):.2%}")
-print(f"Rust P%: {parallel_fraction(Rust_seq_v_4, 4):.2%}")
+c_parallelizable = parallel_fraction(C_seq_v_4, 4)
+rust_parallelizable = parallel_fraction(Rust_seq_v_4, 4)
+print(f"C P%: {c_parallelizable:.2%}")
+print(f"Rust P%: {rust_parallelizable:.2%}")
 ```
 
 ```{python}
-#| echo: false
 min_speedup = min(C_seq_v_4, C_seq_v_8, Rust_seq_v_4, Rust_seq_v_8)
-min_c_over_rust = min(c_v_rust_seq, c_v_rust_4t, c_v_rust_8t)
+max_speedup = max(C_seq_v_4, C_seq_v_8, Rust_seq_v_4, Rust_seq_v_8)
+max_parallelizability = max(c_parallelizable, rust_parallelizable)
 ```
 
 ## Data Analysis
 
-The runtimes for Rust had a lower standard deviation than C.
-
 Both threading methods in C and Rust did improve the speed of the base program by at least `{python} f"{min_speedup:.2f}"` times.
 
-Rust saw the greatest speedup with a `{python} f"{Rust_seq_v_8:.2f}"` times increase in speedup from $1$ thread to $8$ threads.
+Rust saw the greatest speedup with a `{python} f"{max_speedup:.2f}"` times increase in speedup from $1$ thread to $8$ threads.
 
-Nevertheless across all thread counts, C was faster than Rust by at least `{python} f"{min_c_over_rust:.2f}"` times.
+C was significantly faster when run sequentially than Rust at `{python} f"{c_v_rust_seq:.2f}"` times faster.
 
-Which is surprising because the C program was actually theoretically less parallelizaable at `{python} f"{parallel_fraction(C_seq_v_4, 4):.2%}"` parallelizable vs. Rust at `{python} f"{parallel_fraction(Rust_seq_v_4, 4):.2%}"`.
+But, with threading, Rust achieved practically equivalent speeds compared to C.
+
+Rust also had more potential to be parallelized at `{python} f"{max_parallelizability:.2%}"`.
 
 ## Conclusions
 
-With my "vrserver" machine, under the conditions I have set for testing in this research, I can conclude that the C programming language running OpenMP using the `fftw3` threading library in `c-fft/main.c` runs faster than the Rust language running its standard threading library and `rustfft` in `rust-fft/src/main.rs`.
-
-I can also conclude that Rust benefits more from higher thread counts than C in this case. Even though more of the Rust code was parallelizable than the C code in theory.
+With my "vrserver" machine, under the conditions I have set for testing in this research, I can conclude that the C programming language running OpenMP using the `fftw3` threading library in `c-fft/main.c` runs faster than the Rust language running its standard threading library and `rustfft` in `rust-fft/src/main.rs` when using a single thread at a sufficient problem size. Otherwise, as thread count increases, the speed of the Rust program does follow the C program's.
 
 ### Reasoning For Results
 
-I believe that the program did not see a much faster speedup between 4 threads and 8 threads due to a problem size that was too small. I could run it again at a higher problem size but I did not have enough time to do it.
+I am unsure why the Rust program seems to be getting faster overall as thread count increases. Maybe C is getting slow when having to divide up the problem at higher thread counts that don't benefits from having the problem divided across as many threads.
 
-I believe the reason that Rust performed slower than C is due to differences in optimization between the languages.
+I believe that the program did not see a much faster speedup with 8 threads due to a problem size that was too small for that amount of threads to see the benefits of scaling. I could run it again at a higher problem size but I did not have enough time.
 
-The `fftw3` library had threading built in whereas the Rust library did not have it built in. I also only tested it on one device. I believe there could be differences between what Rust has been optimized for between devices.
+I think that the problem with chunking and getting the wrong magnitude in the Rust implementation does has some issues and would need to be resolved in practical use, but I was able to demonstrate speedup with more threads and understand why it is wrong so in my case it is sufficient.
 
-I'm also not exactly sure how the C library handles the threading of the FFT. [This](https://www.fftw.org/fftw3_doc/Usage-of-Multi_002dthreaded-FFTW.html) is the page from the maintainers but I don't think it says how they decided to implement it. It could just be more efficient than my chunk approach in my Rust program.
+I'm not exactly sure how the C library handles the threading of the FFT. [This](https://www.fftw.org/fftw3_doc/Usage-of-Multi_002dthreaded-FFTW.html) is the page from the maintainers but I don't think it says how they decided to implement it. It could just be more efficient than my chunk approach in my Rust program.
 
-I do know that I can parallelize the `peak_mag` finding for loop in C. I did parallelize it in Rust but as you can tell from the data, it didn't provide a faster speed than the C program.
+I can parallelize the `peak_mag` finding `for` loop in C. I did parallelize it in Rust but as you can tell from the data, it wouldn't have made much a difference.
